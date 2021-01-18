@@ -8,7 +8,6 @@
         <div>
             <p>Please pick a category that you want: </p>
             <select v-model="config.category">
-                <option>Pick a Category</option>
                 <option value="11">Entertainment: Film</option>
                 <option value="10">Entertainment: Books</option>
                 <option value="9">General Knowledge</option>

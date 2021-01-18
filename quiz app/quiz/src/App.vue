@@ -1,65 +1,60 @@
 <template>
   <img alt="Vue logo" src="./assets/logo.png">
   <Dashboard @submitConfig="getQuestionsForQuiz" v-if="isDashboardState"/>
-  <Questions v-if="isQuestionsState" :questions="bulkQuestions" @submitScore="displayScore"/>
-  <Results v-if="isResultsState"/>
+  <Questions @submitScore="displayScore" :questions="bulkQuestions" v-if="isQuestionState"/>
+  <Score :result="result" v-if="isScoreState" @newGame="setNewGame"/>
+
+
 </template>
 
 <script>
 import axios from 'axios'
 import Dashboard from './components/Dashboard.vue'
 import Questions from './components/Questions.vue'
-import Results from './components/Results.vue'
-// import HelloWorld from './components/HelloWorld.vue'
-
+import Score from './components/Score.vue'
 export default {
   name: 'App',
   components: {
     Dashboard,
     Questions,
-    Results
+    Score
   },
   computed: {
     isDashboardState () {
-      return this.quizState == 'dashboard'
+      return this.quizState == "dashboard"
     },
-    isQuestionsState () {
-      return this.quizState == 'questions'
+    isQuestionState () {
+      return this.quizState == "questions"
     },
-    IsResultsState () {
-      return this.quizState == 'results'
+    isScoreState () {
+      return this.quizState == "score"
     }
   },
   data() {
     return {
-      quizState: 'dashboard',
-      bulkQuestions: []
+      quizState: "dashboard",
+      bulkQuestions: [],
+      result: []
     }
   },
   methods: {
     getQuestionsForQuiz (config) {
-      console.log(config);
-      var self = this;
-      axios.get(`https://opentdb.com/api.php?amount=${config.numberOfQuestions}&category=${config.category}`).then(response => {
-        console.log(response)
-        this.bulkQuestions = response.data.results;
-        this.quizState = 'questions';
-        console.log(self.bulkQuestions);
-      });
+      var self = this
+      axios.get(`https://opentdb.com/api.php?amount=${config.numberOfQuestions}&category=${config.category}`)
+        .then(response => {
+          self.bulkQuestions = response.data.results
+          this.quizState = "questions"
+        })
     },
-    displayScore(answers){
-     var list = answers.reduce((acc, e) => {
-        if(e) {
-          acc.correct++;
-        } else {
-          acc.falseAns++;
-        }
-        return acc;
-      }, {correct: 0, falseAns: 0});
-
-      alert(`Correct: ${list.correct} False: ${list.falseAns}`);
+    displayScore(answers) {
+      this.result = [...answers];
+      this.quizState = "score";
     },
-    
+    setNewGame () {
+      this.quizState = "dashboard";
+      this.result = []
+      this.bulkQuestions = []
+    }
   },
 }
 </script>
